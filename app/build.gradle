@@ -1,0 +1,57 @@
+apply plugin: 'com.android.application'
+apply plugin: "com.vanniktech.android.javadoc"
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('keystore.properties').newDataInputStream())
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
+    defaultConfig {
+        applicationId "com.cacheux.foodfacts"
+        minSdkVersion 22
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    signingConfigs {
+        release {
+            storeFile project.rootProject.file(properties.getProperty('keystore.file'))
+            storePassword properties.getProperty('keystore.password')
+            keyAlias properties.getProperty('keystore.key')
+            keyPassword properties.getProperty('keystore.keypassword')
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:design:26.0.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha8"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha8"
+    testCompile 'junit:junit:4.12'
+}
